@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CMS Home</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+<body>
+  <div class="hero">
+    <h1>📄 Current CMS Content</h1>
+    <div class="content-box">{{ content|safe }}</div>
+    <a class="edit-link" href="/admin">Edit</a>
+  </div>
+</body>
+</html>

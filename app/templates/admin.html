@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CMS Admin Panel</title>
+  <link rel="stylesheet" href="/static/css/admin.css">
+
+
+</head>
+<body>
+  <div class="admin-container">
+    <h1> CMS Admin Panel</h1>
+    <form method="POST">
+      <textarea name="content" placeholder="Enter new content...">{{ current }}</textarea>
+      <button type="submit">Update Content</button>
+    </form>
+    <div class="history-section">
+      <h2>📜 Last 5 Previous Updates</h2>
+      {% if updates %}
+        {% for timestamp, content in updates %}
+          <div class="history-block">
+            <strong>{{ timestamp }}</strong><br>
+            <pre>{{ content }}</pre>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No update history found.</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

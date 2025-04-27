@@ -1,0 +1,45 @@
+/* static/css/style.css */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.hero {
+  background: white;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 600px;
+}
+
+.content-box {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f7f9fc;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.edit-link {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: #007BFF;
+  color: white;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.edit-link:hover {
+  background: #0056b3;
+}

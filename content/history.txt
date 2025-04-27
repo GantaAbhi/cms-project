@@ -1,0 +1,30 @@
+--- Update at 2025-04-20 18:15:00 ---
+<p>This is the previous content.</p>
+
+--- Update at 2025-04-20 07:54:16 ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Your CMS</title>
+</head>
+<body>
+    <div>
+        <h1>Current Content</h1>
+        <div>{{ content }}</div>
+
+        <h2>History of Updates</h2>
+        <div>{{ history }}</div>
+    </div>
+</body>
+</html>
+
+
+--- Update at 2025-04-20 07:54:35 ---
+this is my first update
+[2025-04-20 11:52:58]
+this is my second update
+---
+[2025-04-20 11:53:34]
+this is my first update
+---
