@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'abhishek4946/cms-project'
-        DOCKER_CREDENTIALS_ID = 'abhishek4946'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
     }
 
     stages {
@@ -37,19 +37,17 @@ pipeline {
             }
         }
 
-stage('Deploy Container') {
-    steps {
-        script {
-            sh '''
-                docker ps -q --filter "name=cms-app" | grep -q . && docker stop cms-app || echo "No running container"
-                docker ps -a -q --filter "name=cms-app" | grep -q . && docker rm cms-app || echo "No container to remove"
-                docker run -d --name cms-app -p 5000:5000 ${DOCKER_IMAGE}:latest
-            '''
+        stage('Deploy Container') {
+            steps {
+                script {
+                    sh '''
+                        docker ps -q --filter "name=cms-app" | grep -q . && docker stop cms-app || echo "No running container"
+                        docker ps -a -q --filter "name=cms-app" | grep -q . && docker rm cms-app || echo "No container to remove"
+                        docker run -d --name cms-app -p 5000:5000 ${DOCKER_IMAGE}:latest
+                    '''
+                }
+            }
         }
-    }
-}
-
-
     }
 
     post {
