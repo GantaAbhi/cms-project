@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'abhishek4946/cms-project'
-        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
+        DOCKER_CREDENTIALS_ID = 'abhishek4946'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/GantaAbhi/cms-project.git'
+                git branch: 'main', url: 'https://github.com/GantaAbhi/cms-project.git'
             }
         }
 
