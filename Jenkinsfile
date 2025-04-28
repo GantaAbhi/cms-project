@@ -42,8 +42,8 @@ pipeline {
             steps {
                 script {
                     bat '''
-                        docker ps -q --filter "name=cms-app" | grep -q . && docker stop cms-app || echo "No running container"
-                        docker ps -a -q --filter "name=cms-app" | grep -q . && docker rm cms-app || echo "No container to remove"
+                        docker ps -q --filter "name=cms-app" | findstr . && docker stop cms-app || echo "No running container"
+                        docker ps -a -q --filter "name=cms-app" | findstr . && docker rm cms-app || echo "No container to remove"
                         docker run -d --name cms-app -p 5000:5000 ${DOCKER_IMAGE}:latest
                     '''
                 }
