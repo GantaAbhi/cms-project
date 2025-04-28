@@ -13,13 +13,14 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build(DOCKER_IMAGE, "-f app/Dockerfile .")
+    stage('Build Docker Image') {
+        steps {
+            script {
+                docker.build(DOCKER_IMAGE, 'app')
                 }
             }
         }
+
 
         stage('Login to DockerHub') {
             steps {
