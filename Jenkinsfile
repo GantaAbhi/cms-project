@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'abhishek4946/cms-project'
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
+        GIT_SSL_NO_VERIFY='true'
     }
 
     stages {
