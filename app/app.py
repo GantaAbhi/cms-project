@@ -1,66 +1,82 @@
 from flask import Flask, render_template, request
 from datetime import datetime
+import mysql.connector
+from mysql.connector import Error
 import os
+import time
 
 app = Flask(__name__)
-CONTENT_DIR = "content"
-HISTORY_FILE = os.path.join(CONTENT_DIR, "history.txt")
-INDEX_FILE = os.path.join(CONTENT_DIR, "index.html")
 
-# Ensure necessary files exist
-os.makedirs(CONTENT_DIR, exist_ok=True)
-open(INDEX_FILE, 'a').close()
-open(HISTORY_FILE, 'a').close()
+# Get DB connection details from environment variables
+db_host = os.environ.get("DB_HOST", "localhost")
+db_user = os.environ.get("DB_USER", "root")
+db_password = os.environ.get("DB_PASSWORD", "root")
+db_name = os.environ.get("DB_NAME", "cms")
+# Database connection
+def get_db_connection():
+    connection = mysql.connector.connect(
+        host=db_host,
+        user=db_user,
+        password=db_password,
+        database=db_name
+    )
+    return connection
+
+# Create table if not exists with retry logic
+def init_db():
+    for i in range(10):  # retry up to 10 times
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS content (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    content TEXT NOT NULL,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            conn.commit()
+            conn.close()
+            print("✅ Database initialized.")
+            break
+        except Error as e:
+            print(f"⏳ DB not ready, retrying in 3s... ({i+1}/10)")
+            time.sleep(3)
+    else:
+        print("❌ Failed to connect to DB after 10 retries.")
+        raise RuntimeError("DB initialization failed")
 
 @app.route('/')
 def public():
-    with open(INDEX_FILE, "r", encoding='utf-8') as f:
-        content = f.read()
-    return render_template('index.html', content=content)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT content FROM content ORDER BY id DESC LIMIT 1")
+    result = cursor.fetchone()
+    conn.close()
+    return render_template("index.html", content=result[0] if result else "No content availble")
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     if request.method == 'POST':
         content = request.form['content']
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO content (content) VALUES (%s)", (content,))
+        conn.commit()
+        conn.close()
+        return render_template("success.html")
 
-        # Save current content to history before updating
-        if os.path.exists(INDEX_FILE):
-            with open(INDEX_FILE, "r", encoding='utf-8') as old_file:
-                old_content = old_file.read()
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            history_entry = f"--- Update at {timestamp} ---\n{old_content.strip()}\n\n"
-            with open(HISTORY_FILE, "a", encoding='utf-8') as history:
-                history.write(history_entry)
-
-        # Save new content
-        with open(INDEX_FILE, "w", encoding='utf-8') as f:
-            f.write(content)
-
-        return render_template('success.html')
-
-    # Read last 5 updates from history.txt (from bottom)
-    updates = []
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r", encoding='utf-8') as f:
-            content = f.read().strip()
-            chunks = content.split("--- Update at ")
-            for chunk in chunks[::-1]:  # reverse for newest first
-                if chunk.strip():
-                    lines = chunk.strip().split("\n", 1)
-                    timestamp = lines[0].strip()
-                    text = lines[1].strip() if len(lines) > 1 else ""
-                    updates.append((timestamp, text))
-                if len(updates) == 5:
-                    break
-
-    # Read current content
-    current_content = ""
-    if os.path.exists(INDEX_FILE):
-        with open(INDEX_FILE, "r", encoding='utf-8') as f:
-            current_content = f.read()
-
-    return render_template('admin.html', current=current_content, updates=updates)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT timestamp, content FROM content ORDER BY id DESC LIMIT 5")
+    updates = cursor.fetchall()
+    conn.close()
+    return render_template("admin.html", updates=updates, current=updates[0][1] if updates else "")
 
 @app.route('/success')
 def success():
-    return render_template('success.html')
+    return render_template("success.html")
+
+if __name__ == '__main__':
+    init_db()
+    app.run(host="0.0.0.0", port=5000, debug=True)

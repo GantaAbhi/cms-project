@@ -25,7 +25,7 @@ pipeline {
         stage('Login to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    bat "echo %PASSWORD% | docker login -u %USERNAME% --password-stdin"
                 }
             }
         }
@@ -41,10 +41,10 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    sh '''
-                        docker ps -q --filter "name=cms-app" | grep -q . && docker stop cms-app || echo "No running container"
-                        docker ps -a -q --filter "name=cms-app" | grep -q . && docker rm cms-app || echo "No container to remove"
-                        docker run -d --name cms-app -p 5000:5000 ${DOCKER_IMAGE}:latest
+                    bat '''
+                        docker ps -q --filter "name=cms-app" | findstr . && docker stop cms-app || echo "No running container"
+                        docker ps -a -q --filter "name=cms-app" | findstr . && docker rm cms-app || echo "No container to remove"
+                        docker run -d --name cms-app -p 5000:5000 %DOCKER_IMAGE%:latest
                     '''
                 }
             }
